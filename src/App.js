@@ -25,18 +25,19 @@ class App extends Component {
 	const formData = new FormData();
 	
 	// Update the formData object
-	formData.append(
-		"avatar",
-		this.state.selectedFile,
-		this.state.selectedFile.name
-	);
+	// formData.append(
+	// 	"avatar",
+	// 	this.state.selectedFile,
+	// 	this.state.selectedFile.name
+	// );
 	
 	// Details of the uploaded file
 	console.log(this.state.selectedFile);
 	
 	// Request made to the backend api
 	// Send formData object
-	axios.post("http://localhost:4000/compression", formData).then(res => {
+/*	axios.post("http://localhost:4000/compression", formData)
+	.then(res => {
     console.log("s!!!", res)
     
     var data = res.data
@@ -47,8 +48,10 @@ class App extends Component {
         document.body.appendChild(a);
         a.style = "display: none";
         return function (data, name) {
-            var blob = new Blob(data, {type: "octet/stream"}),
-                url = window.URL.createObjectURL(blob);
+            var blob = new Blob(data,
+								// {type: "octet/stream"}),
+								{type: "application/pdf"}),
+                				url = window.URL.createObjectURL(blob);
             a.href = url;
             a.download = name;
             a.click();
@@ -62,6 +65,38 @@ class App extends Component {
   }).catch(e => {
     console.log("e!!!", e)
   });
+*/
+
+axios({
+	method: 'GET',
+	url: 'http://localhost:4000/zk',
+	responseType: 'blob'
+	}).then(res => {
+		var data = res.data
+
+		console.log('received ,,,')
+
+    //TODO: to download after conversion, but PDF data is getting blank only blank pages are downloaded or converted from data
+    var saveByteArray = (function () {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        return function (data, name) {
+            var blob = new Blob(data,
+								// {type: "octet/stream"}),
+								{type: "application/pdf"}),
+                				url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = name;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+    }());
+    
+    // saveByteArray([sampleBytes], 'example.txt');
+    saveByteArray([data], 'new.pdf');
+	})
+
 	};
 	
 	// File content to be displayed after
