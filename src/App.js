@@ -4,7 +4,8 @@ import axios from 'axios'
 
 const App = () => {
 	const [selectedFile, setSelectedFile] = useState(null)
-	const [selectedProcess, setSelectedProcess] = useState("compress")
+	const [selectedProcess, setSelectedProcess] = useState("compression")
+	const [isLoading, setIsLoading] = useState(false)
 	
 	// On file select (from the pop up)
 	const onFileChange = event => {
@@ -17,6 +18,9 @@ const App = () => {
 
 	// On file upload (click the upload button)
 	const onFileUpload = () => {
+		
+		setIsLoading(true)
+
 		// Create an object of formData
 		const formData = new FormData()
 		
@@ -54,13 +58,16 @@ const App = () => {
 						a.download = name
 						a.click()
 						window.URL.revokeObjectURL(url)
+
+						setIsLoading(false)
 					}
 				}())
 				
-				saveByteArray([data], `${selectedProcess}-${selectedFile.name}.pdf`)
+				saveByteArray([data], `${selectedProcess}-${selectedFile.name}`)
 			})
 
   		}).catch(e => {
+			setIsLoading(false)
 			console.log("Error occured!", e)
 		})
 	}
@@ -93,20 +100,24 @@ const App = () => {
 			<label htmlFor="process">Choose what to do:</label>
 			<select name="process" id="process" onChange={onProcessChange} value={selectedProcess}>
 				<option value="compression">Compress PDF</option>
-				<option value="unlock">Unlock PDF</option>
-				<option value="encrypt">Encrypt PDF</option>
-				<option value="decrypt">Decrypt PDF</option>
+				<option value="unlock" disabled>Unlock PDF</option>
+				<option value="encrypt" disabled>Encrypt PDF</option>
+				<option value="decrypt" disabled>Decrypt PDF</option>
 				<option value="pageNumber">Add page numbers to PDF</option>
-				<option value="merge">Merge PDF</option>
-				<option value="convert">Convert to PDF</option>
+				<option value="merge" disabled>Merge PDF</option>
+				<option value="convert" disabled>Convert to PDF</option>
 			</select>
 			<div>
 				<input type="file" onChange={onFileChange} />
-				<button
-					onClick={onFileUpload}
-				>
-					Upload
-				</button>
+				{
+					isLoading ? "Loading..." : (
+						<button
+							onClick={onFileUpload}
+						>
+							Upload
+						</button>
+					)
+				}
 			</div>
 			{fileData()}
 		</div>
